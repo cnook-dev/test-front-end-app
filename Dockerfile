@@ -1,25 +1,21 @@
-# เลือก base image ที่มี Node.js
-FROM node:alpine3.19
+FROM node:18-alpine
 
-# กำหนด working directory ใน container
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# คัดลอกไฟล์ package.json และ package-lock.json เข้าไปใน container
+# คัดลอก package.json และ package-lock.json ก่อนเพื่อติดตั้ง dependencies
 COPY package*.json ./
 
 # ติดตั้ง dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
-# คัดลอกไฟล์ source code เข้าไปใน container
+# คัดลอก source code ทั้งหมดหลังจากติดตั้ง dependencies เสร็จ
 COPY . .
 
-ENV PATH /app/node_modules/.bin:$PATH
-
-# สร้าง build สำหรับโปรเจกต์ (ถ้าใช้ React)
+# สร้าง build สำหรับโปรเจกต์ React/Next.js
 RUN npm run build
 
-# เปิดพอร์ต 3000 (ถ้าแอปของคุณรันบนพอร์ตนี้)
+# เปิดพอร์ต 3000
 EXPOSE 3000
 
-# คำสั่งสำหรับรันแอปพลิเคชัน (Next.js ใช้ npm run start หรือ npm run build)
+# รันแอปพลิเคชัน
 CMD ["npm", "start"]
